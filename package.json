@@ -1,0 +1,23 @@
+{
+  "name": "hackday2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+    "dependencies": {
+    "colors": "~1.0.3",
+    "express": "^4.11.2",
+    "https-agent": "~1.0.0",
+    "minimist": "~1.1.0",
+    "mongodb": "~1.4.3",
+    "node-rest-client": "~1.4.4",
+    "request": "~2.53.0",
+    "tunnel": "0.0.3",
+    "unirest": "~0.4.0",
+    "twit" : "1.1.20"
+  }
+}
