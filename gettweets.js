@@ -11,9 +11,7 @@ T.get('search/tweets', { q: 'bbc :)', count: 100 }, function(err, data, response
 
   var jsonString = JSON.stringify(data, null, 4);
   var jsonObj = JSON.parse(jsonString);
-	// console.log(jsonObj.statuses[0].text);
-  // console.log(data)
-
+	
     for ( var i = 0; i < jsonObj.statuses.length; i++ ) {
   		console.log(jsonObj.statuses[i].text);
 	}
