@@ -1,4 +1,5 @@
 var Twit = require('twit')
+var sentiment = require('sentiment');
 
 var T = new Twit({
     consumer_key:         'myK2mQaPzJFsyYL9uIyCTGCRW'
@@ -7,29 +8,73 @@ var T = new Twit({
   , access_token_secret:  'VieqG0OJXAxprVtxbtKy81pXQcZYGCJ5Ypb3B1apTtYWT'
 })
 
-var sentiment = require('sentiment');
 
-T.get('search/tweets', { q: 'topgear', count: 100 }, function(err, data, response) {
+var outputString;
 
-  var jsonString = JSON.stringify(data, null, 4);
-  var jsonObj = JSON.parse(jsonString);
-	
-    for ( var i = 0; i < jsonObj.statuses.length; i++ ) {
-  		// console.log(jsonObj.statuses[i].text);
-      var statusSentiment = sentiment(jsonObj.statuses[i].text);
-      // var statusSentimentJson = JSON.stringify(statusSentiment, null, 4);
+function searchAndAnalyseTweets(searchTerm,callback) {
 
-      //ignore retweets
-      if (statusSentiment.tokens[0] != "rt") {
-        console.log(jsonObj.statuses[i].text);
-        console.log(statusSentiment.score);
-      };
+  T.get('search/tweets', { q: searchTerm, count: 1000 }, function(err, data, response) {
 
-	}
-	console.log(jsonObj.statuses.length + " Results")
+    var jsonString = JSON.stringify(data, null, 4);
+    var jsonObj = JSON.parse(jsonString);
+    var totalScore = 0;
+    var negativeScore = 0;
+    var positiveScore = 0;
+    var counter = 0;
+  	
+      for ( var i = 0; i < jsonObj.statuses.length; i++ ) {
+    		// console.log(jsonObj.statuses[i].text);
+        var statusSentiment = sentiment(jsonObj.statuses[i].text);
+        // console.log(statusSentiment);
+        //ignore retweets
+        if (statusSentiment.tokens[0] != "rt") {
+          counter++;
+          // console.log(jsonObj.statuses[i].text);
+          // console.log(statusSentiment.score);
 
-  if (err) {
-  	  console.log(err);
-  	};
-})
+          if (statusSentiment.score > 0) {
+            positiveScore++;
+          } 
+          else if (statusSentiment.score < 0) {
+            negativeScore++;
+          }
+
+        };
+  	}
+
+    if (err) {
+      console.log(err);
+    };
+
+    totalScore = positiveScore - negativeScore;
+
+    var resultsJson = {
+      'searchTerm' : searchTerm,
+      'totalResults' : counter,
+      'neutralScore' : counter - (negativeScore + positiveScore),
+      'positiveScore' : positiveScore,
+      'negativeScore' : negativeScore,
+      'totalScore' : totalScore
+    }
+
+    outputString = resultsJson;
+    callback();
+    return resultsJson;
+  })
+}
+
+
+function logOutputString() {
+  console.log(outputString);
+};
+
+// searchAndAnalyseTweets("#motd #manutd", logOutputString);
+// searchAndAnalyseTweets("#topgear clarkson", logOutputString);
+
+var hashtags = ["#bbc", "#motd", "#topgear"];
+
+for ( var i = 0; i < hashtags.length; i++ ) {
+  searchAndAnalyseTweets(hashtags[i], logOutputString);
+}
+
 
