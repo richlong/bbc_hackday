@@ -15,9 +15,16 @@ T.get('search/tweets', { q: 'topgear', count: 100 }, function(err, data, respons
   var jsonObj = JSON.parse(jsonString);
 	
     for ( var i = 0; i < jsonObj.statuses.length; i++ ) {
-  		console.log(jsonObj.statuses[i].text);
-      var r1 = sentiment(jsonObj.statuses[i].text);
-      console.dir(r1);        // Score: -2, Comparative: -0.666 
+  		// console.log(jsonObj.statuses[i].text);
+      var statusSentiment = sentiment(jsonObj.statuses[i].text);
+      // var statusSentimentJson = JSON.stringify(statusSentiment, null, 4);
+
+      //ignore retweets
+      if (statusSentiment.tokens[0] != "rt") {
+        console.log(jsonObj.statuses[i].text);
+        console.log(statusSentiment.score);
+      };
+
 	}
 	console.log(jsonObj.statuses.length + " Results")
 
